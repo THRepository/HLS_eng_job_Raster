@@ -9,9 +9,12 @@ typedef struct vec2{
 } vec_2d;
 
 
-// cross vector b from a cross with vector p from a.
+// cross vector p0 X p1.
 component
 comp_int_bit_size_dec cross2d(vec_2d ref, vec_2d p0, vec_2d p1){
+    //  | p0x |   | p1x |
+    //  |     | X |     |
+    //  | p0y |   | p1y |
     return (p0.x - ref.x) * (p1.y - ref.y) - (p0.y - ref.y) * (p1.x - ref.x);
 }
 
