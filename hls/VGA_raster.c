@@ -1,7 +1,7 @@
 #include "raster_functions.h"
 
 component
-vec_2d VGA_raster(char mode,
+comp_int_bit_size_dec VGA_raster(char mode,
            vec_2d vec_0_pos,
            vec_2d vec_1_pos,
            vec_2d vec_2_pos){
@@ -11,7 +11,6 @@ vec_2d VGA_raster(char mode,
                                  x, y, 
                                  bias_w0, bias_w1, bias_w2 ;
 
-    
     if(mode == 1){
         p.x = vmin(vmin(vec_0_pos.x, vec_1_pos.x), vec_2_pos.x);
         p.y = vmin(vmin(vec_0_pos.y, vec_1_pos.y), vec_2_pos.y);
@@ -33,7 +32,7 @@ vec_2d VGA_raster(char mode,
 
         x = p.x;
         y = p.y;
-        return pos;
+        return -1;
     }else{
         for(;y < q.y;)
         {
@@ -48,7 +47,7 @@ vec_2d VGA_raster(char mode,
                 if((w0 >= 0) && (w1 >= 0) && (w2 >= 0))
                 {
                     x++;
-                    return pos;
+                    return y * xmax_screen + x - 1;
                 }
                 x++;
             }
@@ -57,7 +56,7 @@ vec_2d VGA_raster(char mode,
         }
         pos.x = -1;
         pos.y = -1;
-        return pos;
+        return -1;
     }
     
 
@@ -84,7 +83,7 @@ int main(){
     vec_2d p4 = {20, 3};
     vec_2d p5 = {30, 20};
 
-    vec_2d output;
+    comp_int_bit_size_dec output;
 
     char screen_0[xmax_screen][ymax_screen];
     for(int y = 0; y < ymax_screen; y++)
@@ -108,12 +107,11 @@ int main(){
     char end = 0;
     while(end == 0){
         output = VGA_raster(0, p0, p1, p2);
-        if(output.x == -1){
+        if(output == -1){
             end = 1;
             printf("Found end\n\n");
         }else{
-            //printf("found cordinate %d, %d\n", output.x.to_int(), output.y.to_int());
-            screen_0[output.x][output.y] = 1;
+            screen_0[output % xmax_screen][output / xmax_screen] = 1;
         }
     };
 
@@ -121,12 +119,11 @@ int main(){
     end = 0;
     while(end == 0){
         output = VGA_raster(0, p3, p4, p5);
-        if(output.x == -1){
+        if(output == -1){
             end = 1;
             printf("Found end}\n\n");
         }else{
-            printf("found cordinate %d, %d\n", output.x.to_int(), output.y.to_int());
-            screen_1[output.x][output.y] = 1;
+            screen_1[output % xmax_screen][output / xmax_screen] = 1;
         }
     };
 
@@ -173,14 +170,7 @@ int main(){
             pos.y = y;
             tri_0_bool = old_raster(pos, p0, p1, p2);
             tri_1_bool = old_raster(pos, p3, p4, p5);
-            if (((tri_0_bool == 1) && (tri_1_bool == 1)) ||
-                ((screen_0[x][y] == 1) && (tri_0_bool == 1)) ||
-                ((screen_0[x][y] == 1) && (tri_1_bool == 1))) 
-            {
-                printf("*");
-            }else if (((tri_0_bool == 1) && (tri_1_bool == 1)) ||
-                      ((screen_1[x][y] == 1) && (tri_0_bool == 1)) ||
-                      ((screen_1[x][y] == 1) && (tri_1_bool == 1))) 
+            if ((screen_0[x][y] == 1) && (screen_1[x][y] == 1))
             {
                 printf("*");
             }else{
