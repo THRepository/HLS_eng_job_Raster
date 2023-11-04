@@ -1,5 +1,5 @@
 @echo off
-set "SOURCE_FILES=dot_product.c"
+set "SOURCE_FILES=VGA_raster.c"
 set "FPGA_OUTPUT_NAME=ver_1"
 set "FPGA_FLAGS=--quartus-compile"
 set "CLOCK_FLAG=--clock 50MHz"
