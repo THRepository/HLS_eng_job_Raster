@@ -1,10 +1,4 @@
-#include "HLS/hls.h"
-#include "HLS/ac_int.h"
-
-#define max_x 380
-#define max_y 640
-
-#include "dot_product.c"
+#include "raster_functions.h"
 
 component
 char VGA_raster(vec_2d pos,

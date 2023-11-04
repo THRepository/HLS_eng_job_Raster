@@ -1,13 +1,4 @@
-#include "HLS/hls.h"
-#include "HLS/ac_int.h"
-
-typedef int16 comp_int_bit_size_dec;
-
-typedef struct vec2{
-    comp_int_bit_size_dec x;
-    comp_int_bit_size_dec y;
-} vec_2d;
-
+#include "raster_functions.h"
 
 // cross vector p0 X p1.
 comp_int_bit_size_dec cross2d(vec_2d ref0, vec_2d p0, vec_2d p1){
