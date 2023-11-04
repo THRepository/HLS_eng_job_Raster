@@ -27,3 +27,11 @@ comp_int_bit_size_dec vmin(comp_int_bit_size_dec x, comp_int_bit_size_dec y){
     }
 }
 
+comp_int_bit_size_dec vmax(comp_int_bit_size_dec x, comp_int_bit_size_dec y){
+    if (x > y)
+    {
+        return x;
+    }else{
+        return y;
+    }
+}
