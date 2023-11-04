@@ -2,9 +2,9 @@
 
 component
 comp_int_bit_size_dec VGA_raster(char mode,
-           vec_2d vec_0_pos,
-           vec_2d vec_1_pos,
-           vec_2d vec_2_pos){
+           hls_stable_argument vec_2d vec_0_pos,
+           hls_stable_argument vec_2d vec_1_pos,
+           hls_stable_argument vec_2d vec_2_pos){
     static vec_2d p, q;
     vec_2d pos;
     static comp_int_bit_size_dec w0, w1, w2, 
