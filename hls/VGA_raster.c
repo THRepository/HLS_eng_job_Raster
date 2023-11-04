@@ -11,14 +11,12 @@ char VGA_raster(vec_2d pos,
            vec_2d vec_0_pos,
            vec_2d vec_1_pos,
            vec_2d vec_2_pos){
-    comp_int_bit_size_dec cross_0 = cross2d(vec_0_pos, vec_1_pos, pos);
-    comp_int_bit_size_dec cross_1 = cross2d(vec_1_pos, vec_2_pos, pos);
-    comp_int_bit_size_dec cross_2 = cross2d(vec_2_pos, vec_0_pos, pos);
+    comp_int_bit_size_dec cross_0 = cross2d(vec_0_pos, vec_1_pos, pos) + bias2d(vec_0_pos, vec_1_pos);
+    comp_int_bit_size_dec cross_1 = cross2d(vec_1_pos, vec_2_pos, pos) + bias2d(vec_1_pos, vec_2_pos);
+    comp_int_bit_size_dec cross_2 = cross2d(vec_2_pos, vec_0_pos, pos) + bias2d(vec_2_pos, vec_0_pos);
 
     return cross_0 >= 0 && cross_1 >= 0 && cross_2 >= 0;
 }
-
-
 
 int main(){
     printf("Test start!\n");
@@ -34,7 +32,6 @@ int main(){
 
     char tri_0_bool;
     char tri_1_bool;
-    char tri_2_bool;
 
     for(int y = 0; y < 30; y++)
     {
