@@ -226,6 +226,15 @@ int24 write_pixle(ihc::stream_in<compound_information>& pixel_stream){
     return send;
 }
 
+component
+void VGA_write(ihc::stream_in<uint21>& from_VGA_raster,
+               uint3& data,
+               uint18& addr){
+    uint21 memory = from_VGA_raster.read();
+    addr = memory.slc<3>(18);
+    data = memory.slc<17>(0);
+}
+
 char old_raster(vec_2d pos,
            vec_2d vec_0_pos,
            vec_2d vec_1_pos,
