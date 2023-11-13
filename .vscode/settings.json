@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "ostream": "c"
+        "ostream": "c",
+        "stdio.h": "c",
+        "xlocale": "c"
     }
 }
