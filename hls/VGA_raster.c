@@ -7,7 +7,7 @@ typedef struct compound{
         uint4 color;
     } compound_information;
 
-component
+hls_avalon_slave_component component
 void VGA_raster(hls_avalon_slave_memory_argument(7*sizeof(int)) int* tri_args,
                 ihc::stream_out<compound_information,  ihc::usesPackets<true> >& hierarchical_stream)
 {
@@ -57,9 +57,9 @@ void VGA_raster(hls_avalon_slave_memory_argument(7*sizeof(int)) int* tri_args,
     comp_int_bit_size_dec ymax = vmax(vmax(vec_0.y, vec_1.y), vec_2.y);
     comp_int_bit_size_dec ymin = vmin(vmin(vec_0.y, vec_1.y), vec_2.y);
 
-    for(int y = ymin; y < ymax;)
+    for(uint9 y = ymin; y < ymax;)
     {
-        for(int x = xmin; x < xmax;)
+        for(uint9 x = xmin; x < xmax;)
         {
             info.pos.x = x;
             info.pos.y = y;
@@ -71,168 +71,160 @@ void VGA_raster(hls_avalon_slave_memory_argument(7*sizeof(int)) int* tri_args,
     }
 }
 
-component
+hls_always_run_component component
 void hierarchi_part(ihc::stream_in<compound_information,  ihc::usesPackets<true> >& hierarchical_stream, 
                     ihc::stream_out<compound_information, ihc::usesPackets<true> >& pixel_stream){
-    compound_information info = hierarchical_stream.read();
+    bool available;
+    compound_information info = hierarchical_stream.tryRead(available);
+    if(available)
+    {
 
-    #ifdef MERGE
-    hls_merge("direction", "depth") int3 w_direction_top_left  = 0;
-    hls_merge("direction", "depth") int3 w_direction_top_right = 0;
-    hls_merge("direction", "depth") int3 w_direction_bot_left  = 0;
-    hls_merge("direction", "depth") int3 w_direction_bot_right = 0;
-    
-    hls_merge("hw", "depth") comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    hls_merge("hw", "depth") comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    hls_merge("hw", "depth") comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-    #else
-    uint3 w_direction_top_left  = 0;
-    uint3 w_direction_top_right = 0;
-    uint3 w_direction_bot_left  = 0;
-    uint3 w_direction_bot_right = 0;
-    //printf("%d, %d\n", info.pos.x.to_int(), info.pos.y.to_int());
-    comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-    #endif
-    //printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
-    if(w0 >= 0)
-        w_direction_top_left[0] = 1;
-    else
-        w_direction_top_left[0] = 0;
-    if(w1 >= 0)
-        w_direction_top_left[1] = 1;
-    else
-        w_direction_top_left[1] = 0;
-    if(w2 >= 0)
-        w_direction_top_left[2] = 1;
-    else
-        w_direction_top_left[2] = 0;
-    
-    info.pos.x += 79;
-    w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-//printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
-    if(w0 >= 0)
-        w_direction_top_right[0] = 1;
-    else
-        w_direction_top_right[0] = 0;
-    if(w1 >= 0)
-        w_direction_top_right[1] = 1;
-    else
-        w_direction_top_right[1] = 0;
-    if(w2 >= 0)
-        w_direction_top_right[2] = 1;
-    else
-        w_direction_top_right[2] = 0;
-
-    info.pos.y += 59;
-    w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-//printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
-    if(w0 >= 0)
-        w_direction_bot_right[0] = 1;
-    else
-        w_direction_bot_right[0] = 0;
-    if(w1 >= 0)
-        w_direction_bot_right[1] = 1;
-    else
-        w_direction_bot_right[1] = 0;
-    if(w2 >= 0)
-        w_direction_bot_right[2] = 1;
-    else
-        w_direction_bot_right[2] = 0;
-
-    info.pos.x -= 79;
-    w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-//printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
-    if(w0 >= 0)
-        w_direction_bot_left[0] = 1;
-    else
-        w_direction_bot_left[0] = 0;
-    if(w1 >= 0)
-        w_direction_bot_left[1] = 1;
-    else
-        w_direction_bot_left[1] = 0;
-    if(w2 >= 0)
-        w_direction_bot_left[2] = 1;
-    else
-        w_direction_bot_left[2] = 0;
-
-    info.pos.y -= 59;
-
-    //printf("%d, %d, %d, %d\n" , w_direction_top_left.to_int(), w_direction_top_right.to_int(), w_direction_bot_left.to_int(), w_direction_bot_right.to_int());
-    if((
-       (w_direction_top_left  == 7) ||
-       (w_direction_top_right == 7) ||
-       (w_direction_bot_left  == 7) ||
-       (w_direction_bot_right == 7)
-       ) || (
-       (w_direction_top_left[0] != w_direction_top_right[0]) ||
-       (w_direction_top_left[1] != w_direction_top_right[1]) ||
-       (w_direction_top_left[2] != w_direction_top_right[2]) ||
-       (w_direction_top_right[0] != w_direction_bot_left[0]) ||
-       (w_direction_top_right[1] != w_direction_bot_left[1]) ||
-       (w_direction_top_right[2] != w_direction_bot_left[2]) || 
-       (w_direction_bot_left[0] != w_direction_bot_right[0]) ||
-       (w_direction_bot_left[1] != w_direction_bot_right[1]) ||
-       (w_direction_bot_left[2] != w_direction_bot_right[2])
-       ))
-       {
-            for(uint8 y = 0; y < 60;y++)
-            {
-                for(uint8 x = 0; x < 80;x++)
-                {
-                    pixel_stream.write(info);
-                    info.pos.x += 1;
-                }
-                info.pos.x -= 80;
-                info.pos.y += 1;
-            }
+        #ifdef MERGE
+        hls_merge("direction", "depth") int3 w_direction_top_left  = 0;
+        hls_merge("direction", "depth") int3 w_direction_top_right = 0;
+        hls_merge("direction", "depth") int3 w_direction_bot_left  = 0;
+        hls_merge("direction", "depth") int3 w_direction_bot_right = 0;
         
-       }
+        hls_merge("hw", "depth") comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        hls_merge("hw", "depth") comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        hls_merge("hw", "depth") comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+        #else
+        uint3 w_direction_top_left  = 0;
+        uint3 w_direction_top_right = 0;
+        uint3 w_direction_bot_left  = 0;
+        uint3 w_direction_bot_right = 0;
+        //printf("%d, %d\n", info.pos.x.to_int(), info.pos.y.to_int());
+        comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+        #endif
+        //printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
+        if(w0 >= 0)
+            w_direction_top_left[0] = 1;
+        else
+            w_direction_top_left[0] = 0;
+        if(w1 >= 0)
+            w_direction_top_left[1] = 1;
+        else
+            w_direction_top_left[1] = 0;
+        if(w2 >= 0)
+            w_direction_top_left[2] = 1;
+        else
+            w_direction_top_left[2] = 0;
+        
+        info.pos.x += 79;
+        w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+    //printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
+        if(w0 >= 0)
+            w_direction_top_right[0] = 1;
+        else
+            w_direction_top_right[0] = 0;
+        if(w1 >= 0)
+            w_direction_top_right[1] = 1;
+        else
+            w_direction_top_right[1] = 0;
+        if(w2 >= 0)
+            w_direction_top_right[2] = 1;
+        else
+            w_direction_top_right[2] = 0;
+
+        info.pos.y += 59;
+        w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+    //printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
+        if(w0 >= 0)
+            w_direction_bot_right[0] = 1;
+        else
+            w_direction_bot_right[0] = 0;
+        if(w1 >= 0)
+            w_direction_bot_right[1] = 1;
+        else
+            w_direction_bot_right[1] = 0;
+        if(w2 >= 0)
+            w_direction_bot_right[2] = 1;
+        else
+            w_direction_bot_right[2] = 0;
+
+        info.pos.x -= 79;
+        w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+    //printf("%d, %d, %d\n", w0.to_int(), w1.to_int(), w2.to_int());
+        if(w0 >= 0)
+            w_direction_bot_left[0] = 1;
+        else
+            w_direction_bot_left[0] = 0;
+        if(w1 >= 0)
+            w_direction_bot_left[1] = 1;
+        else
+            w_direction_bot_left[1] = 0;
+        if(w2 >= 0)
+            w_direction_bot_left[2] = 1;
+        else
+            w_direction_bot_left[2] = 0;
+
+        info.pos.y -= 59;
+
+        //printf("%d, %d, %d, %d\n" , w_direction_top_left.to_int(), w_direction_top_right.to_int(), w_direction_bot_left.to_int(), w_direction_bot_right.to_int());
+        if((
+        (w_direction_top_left  == 7) ||
+        (w_direction_top_right == 7) ||
+        (w_direction_bot_left  == 7) ||
+        (w_direction_bot_right == 7)
+        ) || (
+        (w_direction_top_left[0] != w_direction_top_right[0]) ||
+        (w_direction_top_left[1] != w_direction_top_right[1]) ||
+        (w_direction_top_left[2] != w_direction_top_right[2]) ||
+        (w_direction_top_right[0] != w_direction_bot_left[0]) ||
+        (w_direction_top_right[1] != w_direction_bot_left[1]) ||
+        (w_direction_top_right[2] != w_direction_bot_left[2]) || 
+        (w_direction_bot_left[0] != w_direction_bot_right[0]) ||
+        (w_direction_bot_left[1] != w_direction_bot_right[1]) ||
+        (w_direction_bot_left[2] != w_direction_bot_right[2])
+        ))
+        {
+                for(uint8 y = 0; y < 60;y++)
+                {
+                    for(uint8 x = 0; x < 80;x++)
+                    {
+                        pixel_stream.write(info);
+                        info.pos.x += 1;
+                    }
+                    info.pos.x -= 80;
+                    info.pos.y += 1;
+                }
+            
+        }
+    }
        
 }
 
-component
-int24 write_pixle(ihc::stream_in<compound_information>& pixel_stream){
-    compound_information info = pixel_stream.read();
-    uint23 send;
-    
-    #ifdef MERGE
-    hls_merge("ww", "depth") comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    hls_merge("ww", "depth") comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    hls_merge("ww", "depth") comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-    #else
-    comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
-    comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
-    comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
-    #endif
-
-    if((w0 >= 0) && (w1 >= 0) && (w2 >= 0))
+hls_always_run_component component
+void write_pixle(ihc::stream_in<compound_information,  ihc::usesPackets<true> >& pixel_stream,
+                 ihc::mm_master<char, ihc::aspace<1>, ihc::awidth<17>, ihc::dwidth<8>, ihc::latency<1>, ihc::readwrite_mode<writeonly>, ihc::waitrequest<true> > &VGA_screen_memory){
+    bool available;
+    compound_information info = pixel_stream.tryRead(available);
+    if(available)
     {
-        send = info.pos.y * xmax_screen + info.pos.x;
-        send[22] = info.color[3];
-        send[21] = info.color[2];
-        send[20] = info.color[1];
-        send[19] = info.color[0];
-    }else{
-        send = -1; // dump pixle
+        #ifdef MERGE
+        hls_merge("ww", "depth") comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        hls_merge("ww", "depth") comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        hls_merge("ww", "depth") comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+        #else
+        comp_int_bit_size_dec w0 = cross2d(info.vec_0_pos, info.vec_1_pos, info.pos) + info.bias_w0;
+        comp_int_bit_size_dec w1 = cross2d(info.vec_1_pos, info.vec_2_pos, info.pos) + info.bias_w1;
+        comp_int_bit_size_dec w2 = cross2d(info.vec_2_pos, info.vec_0_pos, info.pos) + info.bias_w2;
+        #endif
+    
+        if((w0 >= 0) && (w1 >= 0) && (w2 >= 0))
+        {
+            VGA_screen_memory[info.pos.y * xmax_screen + info.pos.x] = info.color;
+            //printf("color: %d\n", info.color.to_int());
+        }
     }
-    return send;
-}
-
-component
-void VGA_write(ihc::stream_in<uint21>& from_VGA_raster,
-               uint3& data,
-               uint18& addr){
-    uint21 memory = from_VGA_raster.read();
-    addr = memory.slc<3>(18);
-    data = memory.slc<17>(0);
 }
 
 char old_raster(vec_2d pos,
@@ -254,12 +246,14 @@ int main(void){
     vec_2d p1 = {45, 170};
     vec_2d p2 = {0, 120};
 
-    char screen_0[xmax_screen][ymax_screen];
+    char screen_0[xmax_screen * ymax_screen];
+    ihc::mm_master<char, ihc::aspace<1>, ihc::awidth<17>, ihc::dwidth<8>, ihc::latency<1>, ihc::readwrite_mode<writeonly>, ihc::waitrequest<true> > m_tb(screen_0, sizeof(char)*320*240);
+
     for(int y = 0; y < ymax_screen; y++)
     {
         for(int x = 0; x < xmax_screen; x++)
         {
-            screen_0[x][y] = 0;
+            screen_0[x + xmax_screen * y] = 0;
         }
     }
 
@@ -323,7 +317,7 @@ int main(void){
 
     ihc::stream_in< compound_information,  ihc::usesPackets<true> > hierarchi_in_stream;
     ihc::stream_out< compound_information, ihc::usesPackets<true> > hierarchi_out_stream;
-    ihc::stream_in< compound_information> write_pixel_in_stream;
+    ihc::stream_in< compound_information,  ihc::usesPackets<true> > write_pixel_in_stream;
     //compound_information output_memory_hierarchi[10000];
     for(int i = 0; i < nr_of_outputs_vga_raster; i++)
     {
@@ -348,8 +342,16 @@ int main(void){
             
     }
     printf("hierarchi_part done with %d outputs.\n", nr_of_outputs_hierarchi);
+    
+   
 
     printf("\nStart test write_pixel.\n");
+
+     for(int i = 0; i < nr_of_outputs_hierarchi; i++)
+    {
+         ihc_hls_enqueue_noret(&write_pixle, write_pixel_in_stream, m_tb);
+    }
+    ihc_hls_component_run_all(write_pixle);
 
     int24 pixle_output;
     uint4 color_smal;
@@ -357,30 +359,30 @@ int main(void){
 
     int xpos, ypos;
 
-    int valid_pixles = 0;
-    static int counter = 0;
-    for(int i = 0; i < nr_of_outputs_hierarchi; i++)
-    {
-        pixle_output = write_pixle(write_pixel_in_stream);
-        if(pixle_output != 8388607){
-            valid_pixles += 1;
-            color_smal[3] = pixle_output[22];
-            pixle_output[22] = 0;
-            color_smal[2] = pixle_output[21];
-            pixle_output[21] = 0;
-            color_smal[1] = pixle_output[20];
-            pixle_output[20] = 0;
-            color_smal[0] = pixle_output[19];
-            pixle_output[19] = 0;
-            color_big = color_smal.to_int();
+    // int valid_pixles = 0;
+    // static int counter = 0;
+    // for(int i = 0; i < nr_of_outputs_hierarchi; i++)
+    // {
+    //     pixle_output = write_pixle(write_pixel_in_stream);
+    //     if(pixle_output != 8388607){
+    //         valid_pixles += 1;
+    //         color_smal[3] = pixle_output[22];
+    //         pixle_output[22] = 0;
+    //         color_smal[2] = pixle_output[21];
+    //         pixle_output[21] = 0;
+    //         color_smal[1] = pixle_output[20];
+    //         pixle_output[20] = 0;
+    //         color_smal[0] = pixle_output[19];
+    //         pixle_output[19] = 0;
+    //         color_big = color_smal.to_int();
 
-            xpos = pixle_output.to_int() % xmax_screen; 
-            ypos = (pixle_output.to_int() - xpos) / xmax_screen; 
-            screen_0[xpos][ypos] = (char)color_big;
-        }
-    }
+    //         xpos = pixle_output.to_int() % xmax_screen; 
+    //         ypos = (pixle_output.to_int() - xpos) / xmax_screen; 
+    //         screen_0[xpos][ypos] = (char)color_big;
+    //     }
+    // }
 
-    printf("write_pixle complete with %d valid pixles", valid_pixles);
+    // printf("write_pixle complete with %d valid pixles", valid_pixles);
 
 
     printf("\nStart test if all pixles are in correct position.");
@@ -435,25 +437,25 @@ int main(void){
     int error_missing = 0;
     int error_extra = 0;
 
-    for(int y = 0; y < 480; y++)
+    for(int y = 0; y < ymax_screen; y++)
     {
-        for(int x = 0; x < 640; x++)
+        for(int x = 0; x < xmax_screen; x++)
         {
-            if((screen_0[x][y] == 1) && (screen_1[x][y] == 1))
+            if((screen_0[x + xmax_screen * y] == 1) && (screen_1[x][y] == 1))
             {
                 correct += 1;
-            }else if((screen_0[x][y] == 0) && (screen_1[x][y] == 1))
+            }else if((screen_0[x + xmax_screen * y] == 0) && (screen_1[x][y] == 1))
             {
                 error_missing += 1;
-            }else if((screen_0[x][y] == 0) && (screen_1[x][y] == 1))
+            }else if((screen_0[x + xmax_screen * y] == 0) && (screen_1[x][y] == 1))
             {
                 error_extra += 1;
             }
         }
     }
-
-    printf("Emulation complete with %d correct pixels, %d missing pixles and %d extra pixles!\n", correct, error_missing, error_extra);
+    
     vec_2d pos;
+
     printf("\n");
     for(int y = 0; y < 60; y++)
     {
@@ -463,13 +465,13 @@ int main(void){
             pos.x = x;
             pos.y = y;
             char tri_1_bool = old_raster(pos, p0, p1, p2);
-            if ((screen_0[x][y] > 0) && (tri_1_bool > 0))
+            if ((screen_0[x + xmax_screen * y] > 0) && (tri_1_bool > 0))
             {
                 printf("*");
             }else if (tri_1_bool > 0)
             {
                 printf("X");
-            }else if (screen_0[x][y] > 0)
+            }else if (screen_0[x + xmax_screen * y] > 0)
             {
                 printf("G");
             }
@@ -489,13 +491,13 @@ int main(void){
             pos.x = x;
             pos.y = y;
             char tri_1_bool = old_raster(pos, p0, p1, p2);
-            if ((screen_0[x][y] > 0) && (tri_1_bool > 0))
+            if ((screen_0[x + xmax_screen * y] > 0) && (tri_1_bool > 0))
             {
                 printf("*");
             }else if (tri_1_bool > 0)
             {
                 printf("X");
-            }else if (screen_0[x][y] > 0)
+            }else if (screen_0[x + xmax_screen * y] > 0)
             {
                 printf("G");
             }
@@ -515,13 +517,13 @@ int main(void){
             pos.x = x;
             pos.y = y;
             char tri_1_bool = old_raster(pos, p0, p1, p2);
-            if ((screen_0[x][y] > 0) && (tri_1_bool > 0))
+            if ((screen_0[x + xmax_screen * y]) && (tri_1_bool > 0))
             {
                 printf("*");
             }else if (tri_1_bool > 0)
             {
                 printf("X");
-            }else if (screen_0[x][y] > 0)
+            }else if (screen_0[x + xmax_screen * y] > 0)
             {
                 printf("G");
             }
@@ -531,6 +533,8 @@ int main(void){
         }
         printf(" |\n");
     }
+
+    printf("\nEmulation complete with %d correct pixels, %d missing pixles and %d extra pixles!\n", correct, error_missing, error_extra);
     
     return 0;
 }

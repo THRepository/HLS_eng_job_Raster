@@ -1,9 +1,9 @@
 @echo off
-set "SOURCE_FILES=VGA_raster.c raster_functions.c"
+set "SOURCE_FILES=raster_functions.c VGA_raster.c"
 set "FPGA_OUTPUT_NAME=ver_2"
 set "FPGA_FLAGS=--quartus-compile"
 set "CLOCK_FLAG=--clock 50MHz"
-set "SIMULATION_FLAG="
+set "SIMULATION_FLAG=--simulator none"
 
 if not "%1"=="" (
   set "TARGET=%1"
