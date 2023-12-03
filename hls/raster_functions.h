@@ -1,7 +1,7 @@
 #ifndef RASTER_FUNCTIONS_H_
 #define RASTER_FUNCTIONS_H_
 
-// Shared includes nad defines. Stopps multiples.
+// Shared includes and defines. Stopps multiples.
 #ifndef PROJECT_SHARED_INC_DEF_FIR_FILTER_
 #define PROJECT_SHARED_INC_DEF_FIR_FILTER_
     #include "HLS/hls.h"
@@ -14,10 +14,10 @@
         comp_int_bit_size_dec x;
         comp_int_bit_size_dec y;
     } vec_2d;
-#endif
 
-#define xmax_screen 320
-#define ymax_screen 240
+    #define xmax_screen 320
+    #define ymax_screen 240
+#endif
 
 comp_int_bit_size_dec cross2d(vec_2d ref0, vec_2d p0, vec_2d p1);
 int2 bias2d(vec_2d p0, vec_2d p1);
