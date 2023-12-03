@@ -2,6 +2,10 @@
     "files.associations": {
         "ostream": "c",
         "stdio.h": "c",
-        "xlocale": "c"
+        "xlocale": "c",
+        "vga_raster.h": "c",
+        "hierarchi_part.h": "c",
+        "shared_definitions.h": "c",
+        "raster_functions.h": "c"
     }
 }
