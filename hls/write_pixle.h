@@ -1,5 +1,5 @@
-#ifndef VGA_RASTER_H_
-#define VGA_RASTER_H_
+#ifndef WRITE_PIXLE_H_
+#define WRITE_PIXLE_H_
 
 // Shared includes and defines. Stopps multiples.
 #ifndef PROJECT_SHARED_INC_DEF_FIR_FILTER_
@@ -28,8 +28,8 @@
 
 #include "raster_functions.h"
 
-hls_avalon_slave_component component
-void VGA_raster(hls_avalon_slave_memory_argument(7*sizeof(int)) int* tri_args,
-                ihc::stream_out<compound_information,  ihc::usesPackets<true> >& hierarchical_stream);
+hls_always_run_component component
+void write_pixle(ihc::stream_in<compound_information,  ihc::usesPackets<true> >& pixel_stream,
+                 ihc::mm_master<char, ihc::aspace<1>, ihc::awidth<17>, ihc::dwidth<8>, ihc::latency<1>, ihc::readwrite_mode<writeonly>, ihc::waitrequest<true> > &VGA_screen_memory);
 
 #endif
