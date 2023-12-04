@@ -15,6 +15,13 @@
         comp_int_bit_size_dec y;
     } vec_2d;
 
+    typedef struct compound{
+        vec_2d pos;
+        vec_2d vec_0_pos, vec_1_pos, vec_2_pos; 
+        comp_int_bit_size_dec bias_w0, bias_w1, bias_w2;
+        uint4 color;
+    } compound_information;
+
     #define xmax_screen 320
     #define ymax_screen 240
 #endif
