@@ -1,4 +1,6 @@
 #include "VGA_raster.h"
+#include "hierarchi_part.h"
+#include "write_pixle.h"
 
 // Software implementation to check if pixel is inside of triangle.
 char old_raster(vec_2d pos,

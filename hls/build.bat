@@ -1,5 +1,5 @@
 @echo off
-set "SOURCE_FILES=raster_functions.c VGA_raster.c testbench.c"
+set "SOURCE_FILES=raster_functions.c VGA_raster.c hierarchi_part.c write_pixle.c testbench.c"
 set "FPGA_OUTPUT_NAME=ver_2"
 set "FPGA_FLAGS=--quartus-compile"
 set "CLOCK_FLAG=--clock 50MHz"

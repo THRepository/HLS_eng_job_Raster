@@ -1,5 +1,5 @@
-#ifndef VGA_RASTER_H_
-#define VGA_RASTER_H_
+#ifndef HIERARCHI_PART_H_
+#define HIERARCHI_PART_H_
 
 // Shared includes and defines. Stopps multiples.
 #ifndef PROJECT_SHARED_INC_DEF_FIR_FILTER_
@@ -28,8 +28,8 @@
 
 #include "raster_functions.h"
 
-hls_avalon_slave_component component
-void VGA_raster(hls_avalon_slave_memory_argument(7*sizeof(int)) int* tri_args,
-                ihc::stream_out<compound_information,  ihc::usesPackets<true> >& hierarchical_stream);
+hls_always_run_component component
+void hierarchi_part(ihc::stream_in<compound_information,  ihc::usesPackets<true> >& hierarchical_stream, 
+                    ihc::stream_out<compound_information, ihc::usesPackets<true> >& pixel_stream);
 
 #endif
