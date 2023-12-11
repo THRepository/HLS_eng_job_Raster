@@ -9,3 +9,5 @@ A VGA-component with suport to be able to communicate with raster components are
 ![Picture of filled screen of triangle drawn by component.](IMG_0266.png)
 
 Example nios system for MAX10 fpga demostrate raster component. Image show the resulting image on VGA screen.
+
+Demonstration video link: [link](https://youtu.be/ynYZmR4_Qbk)
